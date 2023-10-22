@@ -5,6 +5,7 @@ class State {
     data = {
         results: [],
         recipe: {},
+        bookMarks: []
     }
 
     async loadRecipe(id) {
@@ -63,5 +64,35 @@ class State {
         });
         this.data.recipe.servings = newServings;
     }
+
+    addBookMark(recipe) {
+        if(this.data.recipe.id === recipe.id) {
+            this.data.recipe.bookMarked = true;
+            this.data.bookMarks.push(recipe);
+            this.saveBookMarkLocalStorage(this.data.bookMarks)
+        }
+    }
+    deletBookMark(id) {
+        if(this.data.recipe.id === id) {
+            this.data.recipe.bookMarked = false;
+            const index = this.data.bookMarks.findIndex(el => {
+                el.id === id;
+            }) 
+            this.data.bookMarks.splice(index);
+            this.saveBookMarkLocalStorage(this.data.bookMarks)
+        }
+    }
+
+    getBookMarksLocalStorage () {
+        const bookMarks = JSON.parse(localStorage.getItem('bookMarks'));
+        this.data.bookMarks = bookMarks;
+    }
+
+    saveBookMarkLocalStorage(bookMarks) {
+        localStorage.setItem("bookMarks", JSON.stringify(bookMarks));
+    }
 }
 export default new State();
+
+
+

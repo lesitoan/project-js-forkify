@@ -4,18 +4,24 @@ import RecipeView from './view/recipeView';
 import SearchView from './view/searchView';
 import ResultsView from './view/resultsView';
 import PaginationView from './view/paginationView';
+import bookMarksView from './view/bookMarksView';
+
 const showRecipeController = async () => {
   try {
     RecipeView.renderSpinner();
     const id = window.location.hash.slice(1);
     if (!id) throw new Error('Chưa có kết quả !!!!!!!');
-
     // update results view to mark selected search result
     const recipes = State.recipePage(1);
     ResultsView.update(recipes);
     // ----------------------------------
-
     await State.loadRecipe(id);
+    
+    if(State.data.bookMarks.some(el => el.id === State.data.recipe.id)) {
+      State.data.recipe.bookMarked = true;
+    } else {
+      State.data.recipe.bookMarked = false;
+    }
     const recipe = State.data.recipe;
     RecipeView.render(recipe);
   } catch (e) {
@@ -52,9 +58,21 @@ const updateServingsController = (newServings) => {
   RecipeView.update(State.data.recipe);
 }
 
+const  bookmark = () => {
+  if(!State.data.recipe.bookMarked) {
+    State.addBookMark(State.data.recipe);
+  } else {
+    State.deletBookMark(State.data.recipe.id);
+  }
+
+  bookMarksView.render(State.data.bookMarks);
+  RecipeView.update(State.data.recipe);
+}
+
 const init = () => {
   RecipeView.addHandlerRender(showRecipeController);
   RecipeView.addHandlerUpdateRecipe(updateServingsController);
+  RecipeView.addHandlerBookMark(bookmark);
   SearchView.addHandlerRender(searchController);
   PaginationView.addHandlerClick(paginationController);
 }
