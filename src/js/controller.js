@@ -5,6 +5,8 @@ import SearchView from './view/searchView';
 import ResultsView from './view/resultsView';
 import PaginationView from './view/paginationView';
 import bookMarksView from './view/bookMarksView';
+import AddRecipeView from './view/addRecipeView';
+import addRecipeView from './view/addRecipeView';
 
 const showRecipeController = async () => {
   try {
@@ -16,8 +18,10 @@ const showRecipeController = async () => {
     ResultsView.update(recipes);
     // ----------------------------------
     await State.loadRecipe(id);
-    
-    if(State.data.bookMarks.some(el => el.id === State.data.recipe.id)) {
+    bookMarksView.render(State.data.bookMarks);
+
+
+    if (State.data.bookMarks.some(el => el.id === State.data.recipe.id)) {
       State.data.recipe.bookMarked = true;
     } else {
       State.data.recipe.bookMarked = false;
@@ -58,8 +62,8 @@ const updateServingsController = (newServings) => {
   RecipeView.update(State.data.recipe);
 }
 
-const  bookmark = () => {
-  if(!State.data.recipe.bookMarked) {
+const bookmark = () => {
+  if (!State.data.recipe.bookMarked) {
     State.addBookMark(State.data.recipe);
   } else {
     State.deletBookMark(State.data.recipe.id);
@@ -69,12 +73,26 @@ const  bookmark = () => {
   RecipeView.update(State.data.recipe);
 }
 
+
+const addRecipeController = async (data) => {
+  try {
+    addRecipeView.renderSpinner();
+    await State.uploadRecipe(data);
+    addRecipeView.renderMessage('oke !!');
+    State.addBookMark(State.data.recipe);
+    bookMarksView.render(State.data.bookMarks);
+  } catch (e) {
+    addRecipeView.renderError(e);
+  }
+}
+
 const init = () => {
   RecipeView.addHandlerRender(showRecipeController);
   RecipeView.addHandlerUpdateRecipe(updateServingsController);
   RecipeView.addHandlerBookMark(bookmark);
   SearchView.addHandlerRender(searchController);
   PaginationView.addHandlerClick(paginationController);
+  AddRecipeView.addHandlerSubmit(addRecipeController);
 }
 init();
 
