@@ -18,6 +18,7 @@ const showRecipeController = async () => {
     ResultsView.update(recipes);
     // ----------------------------------
     await State.loadRecipe(id);
+    console.log('tesst');
     bookMarksView.render(State.data.bookMarks);
 
 
